@@ -1,7 +1,8 @@
+// NotificationPlugin/index.js
 import Notifications from './Notifications.vue';
 
 const NotificationStore = {
-  state: [], // here the notifications will be added
+  state: [], // notifications array
   settings: {
     overlap: false,
     verticalAlign: 'top',
@@ -9,7 +10,7 @@ const NotificationStore = {
     type: 'info',
     timeout: 5000,
     closeOnClick: true,
-    showClose: true
+    showClose: true,
   },
   setOptions(options) {
     this.settings = Object.assign(this.settings, options);
@@ -43,23 +44,18 @@ const NotificationStore = {
 };
 
 const NotificationsPlugin = {
-  install(Vue, options) {
-    let app = new Vue({
-      data: {
-        notificationStore: NotificationStore
-      },
-      methods: {
-        notify(notification) {
-          this.notificationStore.notify(notification);
-        }
-      }
-    });
-    Vue.prototype.$notify = app.notify;
-    Vue.prototype.$notifications = app.notificationStore;
-    Vue.component('Notifications', Notifications);
+  install(app, options) {
+    // Provide global properties accessible via this.$notify and this.$notifications
+    app.config.globalProperties.$notify = NotificationStore.notify.bind(NotificationStore);
+    app.config.globalProperties.$notifications = NotificationStore;
+
+    // Optionally set config options
     if (options) {
       NotificationStore.setOptions(options);
     }
+
+    // Register component globally
+    app.component('Notifications', Notifications);
   }
 };
 

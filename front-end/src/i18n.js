@@ -1,9 +1,7 @@
-import Vue from 'vue'
-import VueI18n from 'vue-i18n'
-
-Vue.use(VueI18n)
+import { createI18n } from 'vue-i18n'
 
 function loadLocaleMessages () {
+  // Automatically load all JSON locale files from the locales folder
   const locales = require.context('./locales', true, /[A-Za-z0-9-_,\s]+\.json$/i)
   const messages = {}
   locales.keys().forEach(key => {
@@ -16,8 +14,11 @@ function loadLocaleMessages () {
   return messages
 }
 
-export default new VueI18n({
+const i18n = createI18n({
+  legacy: false, // If you want to use Composition API (recommended), set to false
   locale: process.env.VUE_APP_I18N_LOCALE || 'en',
   fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'en',
   messages: loadLocaleMessages()
 })
+
+export default i18n
