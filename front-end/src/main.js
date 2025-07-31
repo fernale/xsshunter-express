@@ -2,6 +2,7 @@
 
 import { createApp, provide } from 'vue'
 import App from './App.vue'
+import NotificationsPlugin from './components/NotificationPlugin';
 import router from './router/index'
 import i18n from './i18n'
 
@@ -30,5 +31,8 @@ app.use(VueMoment)
 app.component('Codemirror', Codemirror)
 
 app.provide('cmExtensions', [basicSetup, oneDark, yaml()])
+
+app.use(NotificationsPlugin, {/* optional options */});
+
 
 app.mount('#app')
