@@ -29,6 +29,6 @@
     "sequelize": "^6.37.2",
     "serve-favicon": "^2.5.1",
     "uuid": "^9.0.1",
-    "vue-moment": "^4.1.0"
+    "vue-moment-v3": "^4.1.0"
   }
 }
