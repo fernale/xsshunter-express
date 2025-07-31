@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:20-slim
 
 # Set up directory for the server
 RUN mkdir /app/
