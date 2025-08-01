@@ -269,6 +269,17 @@ async function get_app_server() {
 			}
 		})
 	});
+	const payloadTemplate = fs.readFileSync('./probe_z.js', 'utf8');
+
+	app.get('/z', (req, res) => {
+		const hostUrl = `https://${process.env.HOSTNAME}`;
+		const replacedPayload = payloadTemplate.replace(/\[HOST_URL\]/g, hostUrl);
+
+		res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.send(replacedPayload);
+	});
+
 
     // Set up /health handler so the user can
     // do uptime checks and appropriate alerting.
@@ -345,6 +356,8 @@ async function get_app_server() {
     app.get('/:probe_id', payload_handler);
 
     return app;
+
+	
 }
 
 module.exports = get_app_server;
