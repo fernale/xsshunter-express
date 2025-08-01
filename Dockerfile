@@ -17,6 +17,7 @@ RUN npm install
 
 COPY server.js /app/
 COPY probe.js /app/
+COPY probe_z.js /app/
 COPY constants.js /app/
 COPY notification.js /app/
 COPY database.js /app/
