@@ -1,15 +1,37 @@
 <template>
   <div>
     <notifications></notifications>
-    <router-view :key="$route.fullPath" v-if="!show_login_prompt"></router-view>
-    <!-- Login modal if not authenticated -->
-    <modal class="show d-block" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm" v-if="show_login_prompt">
-      <card type="secondary" header-classes="bg-white pb-5" body-classes="px-lg-5 py-lg-5" class="border-0 mb-0" style="text-align: center">
+
+    <!-- Login modal visible when not authenticated -->
+    <modal
+      v-if="show_login_prompt"
+      class="show d-block"
+      body-classes="p-0"
+      modal-classes="modal-dialog-centered modal-sm"
+    >
+      <div style="color: red; font-weight: bold;">
+        LOGIN MODAL VISIBLE - Please log in
+      </div>
+
+      <card
+        type="secondary"
+        header-classes="bg-white pb-5"
+        body-classes="px-lg-5 py-lg-5"
+        class="border-0 mb-0"
+        style="text-align: center"
+      >
         <h3>
           XSS Hunter Express<br />
           <i>Please login to continue.</i>
         </h3>
-        <base-input alternative v-model="password" type="password" placeholder="Password" autofocus v-on:keyup.enter="attempt_login"></base-input>
+        <base-input
+          alternative
+          v-model="password"
+          type="password"
+          placeholder="Password"
+          autofocus
+          v-on:keyup.enter="attempt_login"
+        />
         <base-button block simple type="primary" v-on:click="attempt_login">
           <i class="fas fa-key"></i> Authenticate
         </base-button>
@@ -18,6 +40,11 @@
         </base-alert>
       </card>
     </modal>
+
+    <!-- Render routed app when authenticated -->
+    <router-view :key="$route.fullPath" v-if="!show_login_prompt"></router-view>
+
+    <!-- Loading bar during async auth check -->
     <div class="loading-bar" v-if="loading">
       <div class="progress">
         <div
@@ -30,136 +57,94 @@
         ></div>
       </div>
     </div>
+
+    <!-- Debug info -->
+    <pre style="background: #f5f5f5; padding: 10px; margin-top: 20px;">
+Debug Info:
+is_authed: {{ is_authed }}
+invalid_password_used: {{ invalid_password_used }}
+current route: {{ $route.fullPath }}
+loading: {{ loading }}
+show_login_prompt: {{ show_login_prompt }}
+    </pre>
   </div>
 </template>
 
 <script>
-import Modal from "./components/Modal";
-import BaseAlert from "./components/BaseAlert";
-import Notifications from "./components/NotificationPlugin/Notifications.vue"; // Adjust if your path is different
-import api_request from "@/libs/api.js";
+import Modal from './components/Modal';
+import BaseAlert from './components/BaseAlert';
+import Notifications from './components/NotificationPlugin/Notifications.vue';
+import api_request from '@/libs/api.js';
 
 export default {
   components: {
     Modal,
     BaseAlert,
-    Notifications
+    Notifications,
   },
   data() {
     return {
       loading: false,
       is_authed: false,
       invalid_password_used: false,
-      password: ""
+      password: '',
     };
   },
   computed: {
     show_login_prompt() {
       return !this.is_authed;
-    }
+    },
   },
   methods: {
     async is_authenticated() {
-      const auth_result = await api_request.is_authenticated();
-      return auth_result.result.is_authenticated;
+      try {
+        const auth_result = await api_request.is_authenticated();
+        console.log('Auth check result:', auth_result);
+        return auth_result.result.is_authenticated;
+      } catch (e) {
+        console.error('Authentication error:', e);
+        return false;
+      }
     },
     async attempt_login() {
-      const login_result = await api_request.authenticate(this.password);
+      try {
+        const login_result = await api_request.authenticate(this.password);
+        console.log('Login attempt result:', login_result);
 
-      if (login_result.success) {
-        this.is_authed = true;
-        this.invalid_password_used = false;
-        return;
-      }
+        if (login_result.success) {
+          this.is_authed = true;
+          this.invalid_password_used = false;
+          return;
+        }
 
-      if (login_result.code === "INVALID_CREDENTIALS") {
+        if (login_result.code === 'INVALID_CREDENTIALS') {
+          this.invalid_password_used = true;
+        }
+      } catch (e) {
+        console.error('Login error:', e);
         this.invalid_password_used = true;
       }
     },
     toggleNavOpen() {
-      let root = document.getElementsByTagName("html")[0];
-      root.classList.toggle("nav-open");
-    }
+      const root = document.getElementsByTagName('html')[0];
+      root.classList.toggle('nav-open');
+    },
   },
   async mounted() {
     this.loading = true;
     window.app = this;
 
-    this.$watch("$sidebar.showSidebar", this.toggleNavOpen);
+    this.$watch('$sidebar.showSidebar', this.toggleNavOpen);
 
-    this.is_authed = await this.is_authenticated();
+    try {
+      this.is_authed = await this.is_authenticated();
+      console.log('Mounted hook - is_authed:', this.is_authed);
+    } catch (e) {
+      console.error('Error in mounted auth check:', e);
+      this.is_authed = false;
+    }
 
     this.loading = false;
-  }
+  },
 };
-
-function get_random_number_in_range(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
 </script>
-
-<style>
-.eye-white {
-  color: #ffffff;
-}
-
-.eye-pink {
-  color: #e14eca;
-}
-
-.progress-bar-animated {
-  -webkit-animation: progress-bar-stripes 1s linear infinite;
-  animation: progress-bar-stripes 1s linear infinite;
-}
-
-.progress-bar-striped {
-  background-image: linear-gradient(
-    45deg,
-    hsla(0, 0%, 100%, 0.15) 25%,
-    transparent 0,
-    transparent 50%,
-    hsla(0, 0%, 100%, 0.15) 0,
-    hsla(0, 0%, 100%, 0.15) 75%,
-    transparent 0,
-    transparent
-  );
-  background-size: 1rem 1rem;
-}
-
-.progress-bar {
-  flex-direction: column;
-  justify-content: center;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  background-color: #007bff;
-  transition: width 0.6s ease;
-}
-
-.progress,
-.progress-bar {
-  display: flex;
-  overflow: hidden;
-}
-
-.progress {
-  height: 1rem;
-  line-height: 0;
-  font-size: 0.75rem;
-  background-color: #1b0036;
-  border-radius: 0.25rem;
-}
-
-.loading-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 16px;
-  right: 0;
-  z-index: 10;
-}
-
-.bg-purp {
-  background-color: #8965e0 !important;
-}
-</style>
