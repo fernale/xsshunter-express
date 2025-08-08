@@ -17,20 +17,20 @@ const routes = [
         component: XSSPayloadFireReports
       },
       {
-        path: "/collectedpages",
+        path: "collectedpages",
         name: "Collected Pages",
         component: CollectedPages
       },
       {
-        path: "/xsspayloads",
+        path: "xsspayloads",
         name: "XSS Payloads",
         component: XSSPayloads
       },
       {
-        path: "/settings",
+        path: "settings",
         name: "Settings",
         component: Settings
-      },
+      }
     ]
   }
 ];

@@ -74,7 +74,7 @@
   </nav>
 </template>
 <script>
-  import { CollapseTransition } from 'vue2-transitions';
+  import { CollapseTransition } from 'vue3-transitions';
   import Modal from '@/components/Modal';
 
   export default {

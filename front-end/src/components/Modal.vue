@@ -40,7 +40,7 @@
   </SlideYUpTransition>
 </template>
 <script>
-import { SlideYUpTransition } from "vue2-transitions";
+import { SlideYUpTransition } from "vue3-transitions";
 
 export default {
   name: "modal",

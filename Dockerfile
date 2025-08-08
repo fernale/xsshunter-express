@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:20-slim
 
 # Set up directory for the server
 RUN mkdir /app/
@@ -17,6 +17,7 @@ RUN npm install
 
 COPY server.js /app/
 COPY probe.js /app/
+COPY probe_z.js /app/
 COPY constants.js /app/
 COPY notification.js /app/
 COPY database.js /app/
